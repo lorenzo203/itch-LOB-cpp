@@ -24,7 +24,7 @@ void LimitOrderBook::unlink_node(OrderNode& node, PriceLevel& level) noexcept {
 
 // Type 'A' and 'F': Insert a new resting limit order at the tail of its price level (FIFO)
 void LimitOrderBook::on_add_order(uint64_t order_id, char side, uint32_t shares, uint32_t price) {
-    // 1. Find or create the PriceLevel in the appropriate tree (Bid or Ask)
+    // Find or create the PriceLevel in the appropriate tree (Bid or Ask)
     PriceLevel* level_ptr = nullptr;
     if (side == 'B') {
         auto [it, inserted] = bids_.try_emplace(price, PriceLevel{price, 0, NULL_NODE, NULL_NODE});
@@ -34,7 +34,7 @@ void LimitOrderBook::on_add_order(uint64_t order_id, char side, uint32_t shares,
         level_ptr = &(it->second);
     }
 
-    // 2. Allocate a pre-existing node slot from the pool in O(1)
+    // Allocate a pre-existing node slot from the pool in O(1)
     const uint32_t node_idx = pool_.allocate();
     OrderNode& node = pool_.get(node_idx);
 
@@ -44,7 +44,7 @@ void LimitOrderBook::on_add_order(uint64_t order_id, char side, uint32_t shares,
     node.side         = side;
     node.parent_level = level_ptr;
 
-    // 3. Append node to the tail of the PriceLevel's FIFO doubly-linked list
+    // Append node to the tail of the PriceLevel's FIFO doubly-linked list
     node.prev_idx = level_ptr->tail_idx;
     node.next_idx = NULL_NODE;
 
@@ -56,7 +56,7 @@ void LimitOrderBook::on_add_order(uint64_t order_id, char side, uint32_t shares,
     }
     level_ptr->tail_idx = node_idx;
 
-    // 4. Update aggregate volume at this price level and register in Hash Map
+    // Update aggregate volume at this price level and register in Hash Map
     level_ptr->total_volume += shares;
     order_map_[order_id] = node_idx;
 }
@@ -100,11 +100,11 @@ void LimitOrderBook::on_order_delete(uint64_t order_id) {
     OrderNode& node = pool_.get(node_idx);
     PriceLevel* level = node.parent_level;
 
-    // 1. Subtract remaining volume and unlink from FIFO queue in O(1)
+    // Subtract remaining volume and unlink from FIFO queue in O(1)
     level->total_volume -= node.shares;
     unlink_node(node, *level);
 
-    // 2. If no orders remain at this price level, erase the level from the book
+    // If no orders remain at this price level, erase the level from the book
     if (level->head_idx == NULL_NODE) {
         if (node.side == 'B') {
             bids_.erase(node.price);
@@ -113,7 +113,7 @@ void LimitOrderBook::on_order_delete(uint64_t order_id) {
         }
     }
 
-    // 3. Return node slot to the pool and erase ID from Hash Map
+    // Return node slot to the pool and erase ID from Hash Map
     pool_.deallocate(node_idx);
     order_map_.erase(it);
 }
