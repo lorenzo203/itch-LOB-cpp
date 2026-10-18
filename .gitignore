@@ -1,0 +1,22 @@
+# Build directories and artifacts
+build/
+.cache/
+bin/
+*.o
+*.out
+*.a
+*.so
+compile_commands.json
+
+# NASDAQ ITCH Data files
+*.ITCH50
+*.gz
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
