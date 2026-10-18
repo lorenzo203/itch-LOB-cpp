@@ -110,5 +110,5 @@ make -j$(nproc)
 ## Usage
 Run the engine by passing the path to the uncompressed ITCH 5.0 binary file and the target ticker symbol:
 ```Bash
-./itch_lob /path/to/01302019.NASDAQ_ITCH50 MSFT
+./itch_lob /path/to/<mmddaaaa>.NASDAQ_ITCH50 <TICKER>
 ```
